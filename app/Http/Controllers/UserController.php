@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\User;
+use App\Response\JsonResponse;
 class UserController extends Controller
 {
 
@@ -14,7 +15,9 @@ class UserController extends Controller
   * @return array
   */
   public static function showAll(){
-    return User::all();
+    $response = new JsonResponse;
+    $response->setData(User::all());
+    return $response->throw();
   }
 
 
@@ -28,7 +31,10 @@ class UserController extends Controller
   * @return array
   */
   public static function get($id){
-    return User::find($id);
+    $data = User::find($id);
+    $response = new JsonResponse;
+    $response->setData($data);
+    return $response->throw();
   }
 
 
@@ -52,12 +58,15 @@ class UserController extends Controller
       'birth_date'  => 'date|required'
     ]);
 
-    return User::create([
+    $data = User::create([
       'firstname'   => $request->firstname,
       'lastname'    => $request->lastname,
       'email'       => $request->email,
       'birth_date'  => $request->birth_date
     ]);
+    $response = new JsonResponse;
+    $response->setData(User::find($request->id));
+    return $response->throw();
   }
 
 
@@ -78,7 +87,7 @@ class UserController extends Controller
       'id'          => 'required|exists:users,id',
       'firstname'   => 'required',
       'lastname'    => 'required',
-      'email'       => 'email|required|unique:users',
+      'email'       => 'email|required',
       'birth_date'  => 'date|required'
     ]);
     User::where('id', $request->id)->update([
@@ -87,7 +96,10 @@ class UserController extends Controller
       'email'       => $request->email,
       'birth_date'  => $request->birth_date
     ]);
-    return 'Done.';
+    $response = new JsonResponse;
+    $response->setData(User::find($request->id));
+    return $response->throw();
+
   }
 
 
@@ -102,6 +114,8 @@ class UserController extends Controller
       'id' => 'required|exists:users,id'
     ]);
     User::destroy($request->id);
-    return 'Done.';
+    $response = new JsonResponse;
+    $response->setMessage("Done.");
+    return $response->throw();
   }
 }
