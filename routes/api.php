@@ -25,3 +25,13 @@ Route::group(['prefix' => 'users'], function(){
   Route::post('/update', 'UserController@update');
   Route::delete('/delete', 'UserController@delete');
 });
+
+
+Route::group(['prefix' => 'projects'], function(){
+  Route::get('/', 'ProjectController@showAll');
+  Route::get('/{id}', 'ProjectController@get');
+  Route::post('/add', 'ProjectController@add');
+  Route::post('/update', 'ProjectController@update');
+  Route::delete('/delete', 'ProjectController@delete');
+  Route::post('/assign', 'ProjectController@assign');
+});

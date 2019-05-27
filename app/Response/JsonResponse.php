@@ -85,7 +85,7 @@ class JsonResponse extends Model
       return;
     }
     if(!is_array($value)){
-      $this->data = array($value);
+      $this->data = $value;
     }else{
       $this->data = $value;
     }
@@ -119,7 +119,7 @@ class JsonResponse extends Model
     $data = [
       'errors' => $this->errors,
       'result' => [
-        'data' =>$this->data,
+        'data' => $this->data,
         'message' => $this->message
       ],
       'status_code' => $this->statusCode
