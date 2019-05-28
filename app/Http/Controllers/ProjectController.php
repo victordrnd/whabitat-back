@@ -6,15 +6,11 @@ use Illuminate\Http\Request;
 use App\Response\JsonResponse;
 use App\Project;
 use App\Status;
+use App\User_projects;
 class ProjectController extends Controller
 {
   public static function showAll(){
-    $projects = Project::all();
-    foreach ($projects as $index => $project) {
-
-      $projects[$index]->status = Status::where('id', $project->status_id)->first(['id','label']);
-      unset($projects[$index]->status_id);
-    }
+    $projects = Project::getAll();
     $response = new JsonResponse;
     $response->setData($projects);
     return $response->throw();
@@ -24,9 +20,13 @@ class ProjectController extends Controller
 
 
   public static function get($id){
-    $project = Project::find($id);
     $response = new JsonResponse;
-    $response->setData($project);
+    if(!is_null(Project::find($id))){
+      $project = Project::getWithDetails($id);
+      $response->setData($project);
+    }else{
+      $response->addErrors(["Project ".$id." doesn't exist."]);
+    }
     return $response->throw();
   }
 
@@ -55,6 +55,7 @@ class ProjectController extends Controller
       'progress' => $progress,
       'status_id' =>$status_id
     ]);
+
     $response = new JsonResponse;
     $response->setData($project);
     return $response->throw();
@@ -73,7 +74,7 @@ class ProjectController extends Controller
       'progress' => $request->progress,
       'status_id' => $request->status_id
     ]);
-    $project = Project::find($request->id);
+    $project = Project::getWithDetails($request->id);
     $project->status = Status::where('id', $project->status_id)->first(['id','label']);
     unset($project->status_id);
     $response = new JsonResponse;
@@ -94,12 +95,21 @@ class ProjectController extends Controller
 
 
   public static function assign(Request $request){
-      if(is_array($request->users)){
-        $users = $request->users;
-        foreach ($users as $index => $user) {
-          
-        }
-      }
+    $request->validate([
+      'users_id' => 'exists:users,id|required',
+      'project_id' => 'exists:projects,id|required'
+    ]);
+    $users = $request->users_id;
+    User_projects::where('project_id', $request->project_id)->delete();
+    foreach ($users as $user) {
+      User_projects::create([
+        'user_id' => $user,
+        'project_id' => $request->project_id
+      ]);
+    }
+    $response = new JsonResponse;
+    $response->setData(Project::getWithDetails($request->project_id));
+    return $response->throw();
   }
 
 }
