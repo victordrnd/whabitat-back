@@ -4,11 +4,14 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Response\JsonResponse;
-use Validator;
 use App\Project;
-use App\Status;
 use App\User_projects;
+use App\Http\Requests\Project\AddProjectRequest;
+use App\Http\Requests\Project\UpdateProjectRequest;
+use App\Http\Requests\Project\DeleteProjectRequest;
+use App\Http\Requests\Project\AssignProjectRequest;
 use App\Http\Resources\Project as ProjectResource;
+use App\Http\Resources\Projects as ProjectsResource;
 class ProjectController extends Controller
 {
   /**
@@ -16,9 +19,8 @@ class ProjectController extends Controller
   * @return array
   */
   public static function showAll(){
-    $projects = Project::getAll();
-    $response = new JsonResponse;
-    return $response->setData($projects);
+    $projects = new ProjectsResource(Project::all());
+    return JsonResponse::setData($projects);
   }
 
 
@@ -29,13 +31,11 @@ class ProjectController extends Controller
   * @return array
   */
   public static function get($id){
-    
     $project = new ProjectResource(Project::find($id));
-    $response = new JsonResponse;
     if(!is_null(Project::find($id))){
-      return $response->setData($project);
+      return JsonResponse::setData($project);
     }else{
-      return $response->addErrors(["Project ".$id." doesn't exist."]);
+      return JsonResponse::setError("Project ". $id." can't be found");
     }
   }
 
@@ -45,29 +45,17 @@ class ProjectController extends Controller
   * @param string $label
   * @param int $progress
   */
-  public static function add(Request $request){
-    $validator = Validator::make($request->all(),[
-      'label' => 'string|required',
-      'progress' => 'integer|required'
-    ]);
-    $response = new JsonResponse;
-    if($validator->fails()){
-      return $response->addErrors(array($validator->errors()));
-    }
-
-    if($request->filled('status_id')){
-      $status_id = $request->status_id;
-    }else{
-      $status_id = 1;
-    }
+  public static function add(AddProjectRequest $request){
     $project = Project::create([
       'label' => $request->label,
-      'progress' => $progress,
-      'status_id' =>$status_id
+      'progress' => $request->progress,
+      'status_id' => $request->status_id
     ]);
     $formattedproject = new ProjectResource($project);
-    return $response->setData($project);
+    return JsonResponse::setData($formattedproject);
   }
+
+
 
   /**
   * Update a specific project
@@ -76,17 +64,8 @@ class ProjectController extends Controller
   * @param string $label
   * @return array
   */
-  public static function update(Request $request){
-    $validator = Validator::make($request->all(),[
-      'id' => 'integer|exists:projects,id',
-      'progress' => 'integer|required',
-      'label' => 'string|required'
-    ]);
+  public static function update(UpdateProjectRequest $request){
     $response = new JsonResponse;
-    if($validator->fails()){
-      return $response->addErrors(array($validator->errors()));
-    }
-
     Project::where('id', $request->id)->update([
       'label' => $request->label,
       'progress' => $request->progress,
@@ -104,18 +83,10 @@ class ProjectController extends Controller
   * @param int id
   * @return array
   */
-  public static function delete(Request $request){
-    $validator = Validator::make($request->all(),[
-      'id' => 'required|integer|exists:projects,id'
-    ]);
-    $response = new JsonResponse;
-    if($validator->fails()){
-      return $response->addErrors(array($validator->errors()));
-    }
-    Project::destroy($request->id);
+  public static function delete(DeleteProjectRequest $request){
+    Project::where('id', $request->id)->delete();
     User_projects::where('project_id', $request->id)->delete();
-
-    return $response->setMessage('Done.');
+    return JsonResponse::setMessage("Done.");
   }
 
 
@@ -124,21 +95,20 @@ class ProjectController extends Controller
   * @param int project_id
   * @return array
   */
-  public static function assign(Request $request){
-    $request->validate([
-      'users_id' => 'exists:users,id|required',
-      'project_id' => 'exists:projects,id|required'
-    ]);
-    $users = $request->users_id;
+  public static function assign(AssignProjectRequest $request){
+    if(!$request->filled('users_id')){
+      User_projects::where('project_id', $request->project_id)->delete();
+      $formattedproject = new ProjectResource(Project::find($request->project_id));
+      return JsonResponse::setData($formattedproject);
+    }
     User_projects::where('project_id', $request->project_id)->delete();
-    foreach ($users as $user) {
+    foreach ($request->users_id as $user) {
       User_projects::firstOrCreate([
         'user_id' => $user,
         'project_id' => $request->project_id
       ]);
     }
-    $response = new JsonResponse;
-    return $response->setData(Project::getWithDetails($request->project_id));
+    return JsonResponse::setData(new ProjectResource(Project::find($request->project_id)));
   }
 
 }

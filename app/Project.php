@@ -7,12 +7,15 @@ use Illuminate\Database\Eloquent\Model;
 use App\User_projects;
 use App\Status;
 use App\User;
+use Illuminate\Database\Eloquent\SoftDeletes;
 class Project extends Model
 {
+  use SoftDeletes;
   public $timestamps = false;
   protected $fillable = [
-      'label', 'progress', 'status_id'
+    'label', 'progress', 'status_id'
   ];
+  protected $softDelete = true;
 
 
 
@@ -30,7 +33,7 @@ class Project extends Model
       $usersarray[] = User::find($user->user_id);
     }
     $project->users = $usersarray;
-    $project->status = Status::select('label')->where('id', $project->status_id)->first();
+    $project->status = Status::where('id', $project->status_id)->first();
     unset($project->status_id);
     return $project;
   }

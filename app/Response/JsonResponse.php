@@ -7,116 +7,46 @@ use Illuminate\Support\Facades\Response;
 
 class JsonResponse extends Model
 {
-  private $data = array();
-  private $errors = array();
-  private $message = "Success";
-  private $statusCode = 200;
-
-
-
-  /*******************************************************
-  * Accesseurs en lecture                               *
-  *******************************************************/
-  public function getErrors ()
-  {
-    return $this->errors;
-  }
-
-  public function getMessage(){
-    return $this->message;
-  }
-
-  public function getData ()
-  {
-    return $this->data;
-  }
-
-
-  public function getStatusCode()
-  {
-    return $this->statusCode;
-  }
-
   /**************************************************
   * Accesseurs en écriture                          *
   **************************************************/
-  public function setStatusCode($code)
+  public static function setData($value)
   {
-    $this->statusCode = $code;
-    return $this;
+    return JsonResponse::array($value, []);
+  }
+
+  public static function setError($error){
+    return JsonResponse::array(null,$error);
   }
 
 
-  public function setMessage($message){
-    $this->message = $message;
-    return $this->throw();
+
+  public static function setMessage($message){
+    return JsonResponse::array(null, [], $message);
   }
 
 
-  public function setData($value)
+
+  public static function array($array, $error, $message = "Success")
   {
-    if($value == null){
-      return;
-    }
-    if(!is_array($value)){
-      $this->data = $value;
+    if(is_null($array) && $message == "Success"){
+      $array = [];
+      $message = "Object not founded";
+      $status_code = 420;
     }else{
-      $this->data = $value;
+      if(is_null($array)){
+        $array = [];
+      }
+      $status_code = 200;
     }
-
-    return $this->throw();
-  }
-
-
-  public function error($index, $value = null)
-  {
-    if (is_array($index)) {
-      return $this->mergeErrors($index);
-    }
-    if (is_null($value)) {
-      $this->errors[] = $index;
-    } else {
-      $this->errors[$index] = $value;
-    }
-    return $this;
-  }
-
-
-
-  public function mergeErrors(array $errors)
-  {
-    $this->errors = array_merge($this->errors, $errors);
-    return $this;
-  }
-
-
-
-  public function addErrors(array $errors)
-  {
-    $this->errors = $this->errors + $errors;
-    return $this->throw();;
-  }
-
-  public function throw(){
-    if(empty($this->data) && $this->message == "Success"){
-      $this->error(["Object not found"]);
-      $this->setMessage("Something went wrong");
-      $this->statusCode = 410;
-    }
-    return response()->json($this->toArray(), $this->statusCode);
-  }
-
-
-  public function toArray ()
-  {
     $data = [
-      'errors' => $this->errors,
+      'errors' => $error,
       'result' => [
-        'data' => $this->data,
-        'message' => $this->message
+        'data' => $array,
+        'message' => $message
       ],
-      'status_code' => $this->statusCode
+      'status_code' => $status_code
     ];
-    return $data;
+    return response()->json($data, 200);
   }
 }
