@@ -14,6 +14,14 @@ class Project extends Model
       'label', 'progress', 'status_id'
   ];
 
+
+
+
+  /**
+  * Uses to get all details from a specific project
+  * @param int $id
+  * @return array
+  */
   public static function getWithDetails($id){
     $project = Project::find($id);
     $users = User_projects::where('project_id', $id)->get();
@@ -28,6 +36,10 @@ class Project extends Model
   }
 
 
+  /**
+  * Uses to get all projects with all details
+  * @return array
+  */
   public static function getAll(){
     $projects = Project::all();
     $projectsarray = array();
@@ -36,5 +48,18 @@ class Project extends Model
       $projectsarray[] = $detailedproject;
     }
     return $projectsarray;
+  }
+
+  public static function getUsers($id){
+    $users = User_projects::where('project_id', $id)->get();
+    $usersarray = array();
+    foreach ($users as $key => $user) {
+      $usersarray[] = User::find($user->user_id);
+    }
+    return $usersarray;
+  }
+
+  public static function getStatus($id){
+    return Status::select('label')->where('id', $id)->first();
   }
 }
