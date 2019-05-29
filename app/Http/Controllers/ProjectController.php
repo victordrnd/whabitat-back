@@ -65,21 +65,20 @@ class ProjectController extends Controller
   * @return array
   */
   public static function update(UpdateProjectRequest $request){
-    $response = new JsonResponse;
     Project::where('id', $request->id)->update([
       'label' => $request->label,
       'progress' => $request->progress,
       'status_id' => $request->status_id
     ]);
     $project = new ProjectResource(Project::find($request->id));
-    return $response->setData($project);
+    return JsonResponse::setData($project);
   }
 
 
 
 
   /**
-  *Detelete a project
+  *Delete a project
   * @param int id
   * @return array
   */
@@ -90,12 +89,18 @@ class ProjectController extends Controller
   }
 
 
+
+
+
   /**
   * @param int $users_id
   * @param int project_id
   * @return array
   */
   public static function assign(AssignProjectRequest $request){
+    if(empty(Project::find($request->project_id))){
+      return JsonResponse::setError('not found');
+    }
     if(!$request->filled('users_id')){
       User_projects::where('project_id', $request->project_id)->delete();
       $formattedproject = new ProjectResource(Project::find($request->project_id));
@@ -110,5 +115,4 @@ class ProjectController extends Controller
     }
     return JsonResponse::setData(new ProjectResource(Project::find($request->project_id)));
   }
-
 }

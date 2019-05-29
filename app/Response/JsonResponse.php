@@ -29,6 +29,9 @@ class JsonResponse extends Model
 
   public static function array($array, $error, $message = "Success")
   {
+    if(!is_array($error)){
+      $error = array($error);
+    }
     if(is_null($array) && $message == "Success"){
       $array = [];
       $message = "Object not founded";
