@@ -19,7 +19,7 @@ class ProjectController extends Controller
   * @return array
   */
   public static function showAll(){
-    $projects = new ProjectsResource(Project::all());
+    $projects = Project::with('status')->get();
     return JsonResponse::setData($projects);
   }
 

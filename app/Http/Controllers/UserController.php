@@ -5,6 +5,11 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\User;
 use App\Response\JsonResponse;
+use App\Http\Requests\Users\AddUserRequest;
+use App\Http\Requests\Users\UpdateUserRequest;
+use App\Http\Requests\Users\DeleteUserRequest;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Schema;
 class UserController extends Controller
 {
 
@@ -15,9 +20,7 @@ class UserController extends Controller
   * @return array
   */
   public static function showAll(){
-    $response = new JsonResponse;
-    $response->setData(User::all());
-    return $response->throw();
+    return JsonResponse::setData(User::all());
   }
 
 
@@ -31,10 +34,7 @@ class UserController extends Controller
   * @return array
   */
   public static function get($id){
-    $data = User::find($id);
-    $response = new JsonResponse;
-    $response->setData($data);
-    return $response->throw();
+    return JsonResponse::setData(User::find($id));
   }
 
 
@@ -50,23 +50,17 @@ class UserController extends Controller
   * @param date $birth_date
   * @return array
   */
-  public static function add(Request $request){
-    $validatedData = $request->validate([
-      'firstname'   => 'required',
-      'lastname'    => 'required',
-      'email'       => 'email|required',
-      'birth_date'  => 'date|required'
-    ]);
+  public static function add(AddUserRequest $request){
 
     $data = User::create([
       'firstname'   => $request->firstname,
       'lastname'    => $request->lastname,
       'email'       => $request->email,
-      'birth_date'  => $request->birth_date
+      'password'    => Hash::make($request->password),
+      'birth_date'  => $request->birth_date,
+      'creator_id'  => auth()->user()->id
     ]);
-    $response = new JsonResponse;
-    $response->setData(User::find($request->id));
-    return $response->throw();
+    return JsonResponse::setData($data);
   }
 
 
@@ -82,24 +76,15 @@ class UserController extends Controller
   * @param date $birth_date
   * @return array
   */
-  public static function update(Request $request){
-    $validatedData = $request->validate([
-      'id'          => 'required|exists:users,id',
-      'firstname'   => 'required',
-      'lastname'    => 'required',
-      'email'       => 'email|required',
-      'birth_date'  => 'date|required'
-    ]);
-    User::where('id', $request->id)->update([
-      'firstname'   => $request->firstname,
-      'lastname'    => $request->lastname,
-      'email'       => $request->email,
-      'birth_date'  => $request->birth_date
-    ]);
-    $response = new JsonResponse;
-    $response->setData(User::find($request->id));
-    return $response->throw();
-
+  public static function update(UpdateUserRequest $request){
+    foreach ($request->all() as $proprietyname => $value) {
+      if(Schema::hasColumn('users', $proprietyname)){
+        User::where('id', $request->id)->update([
+          $proprietyname => $value
+        ]);
+      }
+    }
+    return JsonResponse::setData(User::find($request->id));
   }
 
 
@@ -109,13 +94,8 @@ class UserController extends Controller
   * @param int $id
   * @return void
   */
-  public static function delete(Request $request){
-    $validatedData = $request->validate([
-      'id' => 'required|exists:users,id'
-    ]);
+  public static function delete(DeleteUserRequest $request){
     User::destroy($request->id);
-    $response = new JsonResponse;
-    $response->setMessage("Done.");
-    return $response->throw();
+    return JsonResponse::setMessage('Done.');
   }
 }

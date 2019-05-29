@@ -15,6 +15,23 @@ class JsonResponse extends Model
     return JsonResponse::array($value, []);
   }
 
+
+  public static function unauthorized(){
+    return JsonResponse::array(null, "Bad Credentials", "Unauthorized");
+  }
+  public static function exception($e){
+    $data = [
+      'errors' => $e->getFile(). ' on line : '.$e->getLine(),
+      'result' => [
+        'data' => [],
+        'message' => $e->getMessage()
+      ],
+      'status_code' => 401
+    ];
+    return response()->json($data, 401);
+  }
+
+
   public static function setError($error){
     return JsonResponse::array(null,$error);
   }
@@ -29,18 +46,21 @@ class JsonResponse extends Model
 
   public static function array($array, $error, $message = "Success")
   {
+    $status_code = 200;
     if(!is_array($error)){
+      if($error == "Bad Credentials"){
+        $status_code = 401;
+      }
       $error = array($error);
     }
     if(is_null($array) && $message == "Success"){
       $array = [];
       $message = "Object not founded";
-      $status_code = 420;
+      $status_code = 422;
     }else{
       if(is_null($array)){
         $array = [];
       }
-      $status_code = 200;
     }
     $data = [
       'errors' => $error,
@@ -50,6 +70,6 @@ class JsonResponse extends Model
       ],
       'status_code' => $status_code
     ];
-    return response()->json($data, 200);
+    return response()->json($data, $status_code);
   }
 }

@@ -17,21 +17,27 @@ use Illuminate\Http\Request;
 //   return $request->user();
 // });
 
-
-Route::group(['prefix' => 'users'], function(){
-  Route::get('/', 'UserController@showAll');
-  Route::get('/{id}', 'UserController@get');
-  Route::post('/add', 'UserController@add');
-  Route::post('/update', 'UserController@update');
-  Route::delete('/delete', 'UserController@delete');
-});
+  Route::post('/auth/signin', 'AuthController@signin');
 
 
-Route::group(['prefix' => 'projects'], function(){
-  Route::get('/', 'ProjectController@showAll');
-  Route::get('/{id}', 'ProjectController@get');
-  Route::post('/add', 'ProjectController@add');
-  Route::post('/update', 'ProjectController@update');
-  Route::delete('/delete', 'ProjectController@delete');
-  Route::post('/assign', 'ProjectController@assign');
+Route::group(['middleware' => 'jwt.verify'],function(){
+
+
+  Route::group(['prefix' => 'users'], function(){
+    Route::get('/', 'UserController@showAll');
+    Route::get('/{id}', 'UserController@get');
+    Route::post('/add', 'UserController@add');
+    Route::post('/update', 'UserController@update');
+    Route::delete('/delete', 'UserController@delete');
+  });
+
+
+  Route::group(['prefix' => 'projects'], function(){
+    Route::get('/', 'ProjectController@showAll');
+    Route::get('/{id}', 'ProjectController@get');
+    Route::post('/add', 'ProjectController@add');
+    Route::post('/update', 'ProjectController@update');
+    Route::delete('/delete', 'ProjectController@delete');
+    Route::post('/assign', 'ProjectController@assign');
+  });
 });

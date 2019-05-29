@@ -11,12 +11,24 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class Project extends Model
 {
   use SoftDeletes;
+
   public $timestamps = false;
+
   protected $fillable = [
     'label', 'progress', 'status_id'
   ];
+
   protected $softDelete = true;
 
+  protected $hidden = [
+      'deleted_at'
+  ];
+
+
+  public function status()
+  {
+      return $this->belongsTo(Status::class, "status_id");
+  }
 
 
 
