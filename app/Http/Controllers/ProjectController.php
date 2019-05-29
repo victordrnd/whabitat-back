@@ -19,7 +19,7 @@ class ProjectController extends Controller
   * @return array
   */
   public static function showAll(){
-    $projects = Project::with('status')->get();
+    $projects = Project::with(['status', 'users'])->get();
     return JsonResponse::setData($projects);
   }
 
@@ -31,7 +31,7 @@ class ProjectController extends Controller
   * @return array
   */
   public static function get($id){
-    $project = new ProjectResource(Project::find($id));
+    $project = Project::where('id', $id)->with(['status', 'users'])->get();
     if(!is_null(Project::find($id))){
       return JsonResponse::setData($project);
     }else{
@@ -45,13 +45,15 @@ class ProjectController extends Controller
   * @param string $label
   * @param int $progress
   */
-  public static function add(AddProjectRequest $request){
+  public static function add(Request $request){
+    return 'test';
     $project = Project::create([
       'label' => $request->label,
       'progress' => $request->progress,
-      'status_id' => $request->status_id
+      'status_id' => $request->status_id,
+      'creator_id' => auth()->user()->id
     ]);
-    $formattedproject = new ProjectResource($project);
+    $formattedproject = Project::find($project->id)->with((['status', 'users']))->get();
     return JsonResponse::setData($formattedproject);
   }
 
@@ -70,7 +72,7 @@ class ProjectController extends Controller
       'progress' => $request->progress,
       'status_id' => $request->status_id
     ]);
-    $project = new ProjectResource(Project::find($request->id));
+    $project = Project::find($request->id)->with(['status','users']);
     return JsonResponse::setData($project);
   }
 

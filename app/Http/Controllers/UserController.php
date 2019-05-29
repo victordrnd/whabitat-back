@@ -20,7 +20,7 @@ class UserController extends Controller
   * @return array
   */
   public static function showAll(){
-    return JsonResponse::setData(User::all());
+    return JsonResponse::setData(User::with('projects')->get());
   }
 
 
@@ -34,7 +34,7 @@ class UserController extends Controller
   * @return array
   */
   public static function get($id){
-    return JsonResponse::setData(User::find($id));
+    return JsonResponse::setData(User::where('id', $id)->with('projects')->get());
   }
 
 

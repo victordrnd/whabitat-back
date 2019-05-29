@@ -15,19 +15,23 @@ class Project extends Model
   public $timestamps = false;
 
   protected $fillable = [
-    'label', 'progress', 'status_id'
+    'label', 'progress', 'status_id', 'creator_id'
   ];
 
   protected $softDelete = true;
 
   protected $hidden = [
-      'deleted_at'
+      'deleted_at', 'pivot'
   ];
 
 
   public function status()
   {
       return $this->belongsTo(Status::class, "status_id");
+  }
+
+  public function users(){
+    return $this->belongsToMany(User::class, "user_projects","user_id", "project_id");
   }
 
 

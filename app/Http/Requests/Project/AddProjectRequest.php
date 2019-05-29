@@ -24,9 +24,9 @@ class AddProjectRequest extends FormRequest
     public function rules()
     {
       return [
-        'label' => 'required|string',
-        'status_id' => 'required|exists:status,id|integer',
-        'progress' => 'required|integer|between:0,100'
+        // 'label' => 'required|string',
+        // 'status_id' => 'required|exists:status,id|integer',
+        // 'progress' => 'required|integer|between:0,100'
       ];
     }
 }

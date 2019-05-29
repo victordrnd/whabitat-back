@@ -18,6 +18,10 @@ class User extends Authenticatable implements JWTSubject
     'firstname', 'lastname', 'email', 'birth_date', 'password', 'creator_id'
   ];
 
+  public function projects(){
+    return $this->belongsToMany(Project::class,'user_projects','project_id','user_id');
+  }
+
   /**
   * The attributes that should be hidden for arrays.
   *
