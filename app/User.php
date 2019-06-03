@@ -22,11 +22,11 @@ class User extends Authenticatable implements JWTSubject
   ];
   protected $softDelete = true;
 
-  protected $hidden = ['password', 'profil_id', 'creator_id', 'created_at', 'updated_at', 'deleted_at'];
+  protected $hidden = ['password', 'profil_id', 'creator_id', 'created_at', 'updated_at', 'deleted_at','pivot'];
 
   public function projects()
   {
-    return $this->belongsToMany(Project::class, 'user_projects', 'project_id', 'user_id');
+    return $this->belongsToMany(Project::class, 'user_projects', 'user_id', 'project_id');
   }
 
 

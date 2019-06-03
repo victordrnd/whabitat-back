@@ -40,5 +40,7 @@ Route::group(['middleware' => 'jwt.verify'], function () {
     Route::post('/update', 'ProjectController@update')->middleware('CheckRight:editProjectStatus');
     Route::delete('/delete', 'ProjectController@delete');
     Route::post('/assign', 'ProjectController@assign');
+
+    Route::post('/search', 'ProjectController@search');
   });
 });

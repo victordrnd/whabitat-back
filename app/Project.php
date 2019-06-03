@@ -21,7 +21,7 @@ class Project extends Model
   protected $softDelete = true;
 
   protected $hidden = [
-      'created_at', 'updated_at', 'creator_id','status_id', 'deleted_at', 'pivot'
+      'created_at', 'updated_at', 'creator_id', 'deleted_at', 'pivot'
   ];
 
 
@@ -31,7 +31,7 @@ class Project extends Model
   }
 
   public function users(){
-    return $this->belongsToMany(User::class, "user_projects","user_id", "project_id");
+    return $this->belongsToMany(User::class, "user_projects","project_id", "user_id");
   }
 
 
