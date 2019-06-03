@@ -10,8 +10,6 @@ use App\Http\Requests\Project\AddProjectRequest;
 use App\Http\Requests\Project\UpdateProjectRequest;
 use App\Http\Requests\Project\DeleteProjectRequest;
 use App\Http\Requests\Project\AssignProjectRequest;
-use App\Http\Resources\Project as ProjectResource;
-use App\Http\Resources\Projects as ProjectsResource;
 class ProjectController extends Controller
 {
   /**
@@ -45,15 +43,14 @@ class ProjectController extends Controller
   * @param string $label
   * @param int $progress
   */
-  public static function add(Request $request){
-    return 'test';
+  public static function add(AddProjectRequest $request){
     $project = Project::create([
       'label' => $request->label,
       'progress' => $request->progress,
       'status_id' => $request->status_id,
       'creator_id' => auth()->user()->id
     ]);
-    $formattedproject = Project::find($project->id)->with((['status', 'users']))->get();
+    $formattedproject = Project::where('id', $project->id)->with((['status', 'users']))->first();
     return JsonResponse::setData($formattedproject);
   }
 
@@ -105,7 +102,7 @@ class ProjectController extends Controller
     }
     if(!$request->filled('users_id')){
       User_projects::where('project_id', $request->project_id)->delete();
-      $formattedproject = new ProjectResource(Project::find($request->project_id));
+      $formattedproject = Project::where('id',$request->project_id)->with('status', 'users')->get();
       return JsonResponse::setData($formattedproject);
     }
     User_projects::where('project_id', $request->project_id)->delete();
@@ -115,6 +112,7 @@ class ProjectController extends Controller
         'project_id' => $request->project_id
       ]);
     }
-    return JsonResponse::setData(new ProjectResource(Project::find($request->project_id)));
+    return JsonResponse::setData(Project::where('id',$request->project_id)->with(['users', 'status']))->get();
   }
 }
+

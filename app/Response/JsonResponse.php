@@ -15,9 +15,8 @@ class JsonResponse extends Model
     return JsonResponse::array($value, []);
   }
 
-
   public static function unauthorized(){
-    return JsonResponse::array(null, "Bad Credentials", "Unauthorized");
+    return JsonResponse::array(null, "Not Allowed", "Unauthorized");
   }
   public static function exception($e){
     $data = [
@@ -48,7 +47,7 @@ class JsonResponse extends Model
   {
     $status_code = 200;
     if(!is_array($error)){
-      if($error == "Bad Credentials"){
+      if($error == "Not Allowed"){
         $status_code = 401;
       }
       $error = array($error);

@@ -34,7 +34,8 @@ class UserController extends Controller
   * @return array
   */
   public static function get($id){
-    return JsonResponse::setData(User::where('id', $id)->with('projects')->get());
+    $user = User::where('id', $id)->with(['projects'])->get();
+    return JsonResponse::setData($user);
   }
 
 

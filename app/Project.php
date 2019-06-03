@@ -12,7 +12,7 @@ class Project extends Model
 {
   use SoftDeletes;
 
-  public $timestamps = false;
+
 
   protected $fillable = [
     'label', 'progress', 'status_id', 'creator_id'
@@ -21,7 +21,7 @@ class Project extends Model
   protected $softDelete = true;
 
   protected $hidden = [
-      'deleted_at', 'pivot'
+      'created_at', 'updated_at', 'creator_id','status_id', 'deleted_at', 'pivot'
   ];
 
 

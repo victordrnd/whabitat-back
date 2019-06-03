@@ -17,13 +17,13 @@ use Illuminate\Http\Request;
 //   return $request->user();
 // });
 
-  Route::post('/auth/signin', 'AuthController@signin');
+Route::post('/auth/signin', 'AuthController@signin');
 
 
-Route::group(['middleware' => 'jwt.verify'],function(){
+Route::group(['middleware' => 'jwt.verify'], function () {
 
 
-  Route::group(['prefix' => 'users'], function(){
+  Route::group(['prefix' => 'users'], function () {
     Route::get('/', 'UserController@showAll');
     Route::get('/{id}', 'UserController@get');
     Route::post('/add', 'UserController@add');
@@ -32,11 +32,12 @@ Route::group(['middleware' => 'jwt.verify'],function(){
   });
 
 
-  Route::group(['prefix' => 'projects'], function(){
-    Route::get('/', 'ProjectController@showAll');
+  Route::group(['prefix' => 'projects'], function () {
+    
+    Route::get('/', 'ProjectController@showAll')      ->middleware('CheckRight:seeAllProject');
     Route::get('/{id}', 'ProjectController@get');
     Route::post('/add', 'ProjectController@add');
-    Route::post('/update', 'ProjectController@update');
+    Route::post('/update', 'ProjectController@update')->middleware('CheckRight:editProjectStatus');
     Route::delete('/delete', 'ProjectController@delete');
     Route::post('/assign', 'ProjectController@assign');
   });
