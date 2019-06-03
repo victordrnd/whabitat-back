@@ -7,6 +7,7 @@ use Illuminate\Notifications\Notifiable;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
+
 class User extends Authenticatable implements JWTSubject
 {
   use Notifiable;
@@ -18,7 +19,7 @@ class User extends Authenticatable implements JWTSubject
    * @var array
    */
   protected $fillable = [
-    'firstname', 'lastname', 'email', 'birth_date', 'password', 'creator_id'
+    'firstname', 'lastname', 'email', 'birth_date', 'profil_id', 'password', 'creator_id'
   ];
   protected $softDelete = true;
 
@@ -53,6 +54,14 @@ class User extends Authenticatable implements JWTSubject
     return [];
   }
 
+  public function parseUserRequest($request){
+      $this->firstname  = $request->get('firstname');
+      $this->lastname   = $request->get('lastname');
+      $this->email      = $request->get('email');
+      $this->birth_date = $request->get('birth_date');
+      $this->password   = Hash::make($request->password);
+      $this->creator_id = auth()->user()->id;
+  }
 
   public function hasRight($rightToCheck)
   {

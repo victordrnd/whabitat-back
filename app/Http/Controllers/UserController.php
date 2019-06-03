@@ -8,8 +8,10 @@ use App\Response\JsonResponse;
 use App\Http\Requests\Users\AddUserRequest;
 use App\Http\Requests\Users\UpdateUserRequest;
 use App\Http\Requests\Users\DeleteUserRequest;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
+Use App\Services\UserService;
+
 class UserController extends Controller
 {
 
@@ -34,7 +36,12 @@ class UserController extends Controller
   * @return array
   */
   public static function get($id){
-    $user = User::where('id', $id)->with(['projects'])->get();
+    try{
+      $user = User::where('id', $id)->with(['projects'])->firstOrFail();
+
+    }catch(ModelNotFoundException $e){
+      return JsonResponse::exception($e);
+    }
     return JsonResponse::setData($user);
   }
 
@@ -53,14 +60,8 @@ class UserController extends Controller
   */
   public static function add(AddUserRequest $request){
 
-    $data = User::create([
-      'firstname'   => $request->firstname,
-      'lastname'    => $request->lastname,
-      'email'       => $request->email,
-      'password'    => Hash::make($request->password),
-      'birth_date'  => $request->birth_date,
-      'creator_id'  => auth()->user()->id
-    ]);
+    $data = new \App\Services\UserService;
+    $data = $data->create($request);
     return JsonResponse::setData($data);
   }
 
@@ -78,13 +79,18 @@ class UserController extends Controller
   * @return array
   */
   public static function update(UpdateUserRequest $request){
-    foreach ($request->all() as $proprietyname => $value) {
-      if(Schema::hasColumn('users', $proprietyname)){
-        User::where('id', $request->id)->update([
-          $proprietyname => $value
-        ]);
-      }
-    }
+    // foreach ($request->all() as $proprietyname => $value) {
+    //   if(Schema::hasColumn('users', $proprietyname)){
+    //     User::where('id', $request->id)->update([
+    //       $proprietyname => $value
+    //     ]);
+    //   }
+    // }
+
+    $data = User::findOrFail($request->id);
+    $data->parseUserRequest($request);
+    $data->save();
+
     return JsonResponse::setData(User::find($request->id));
   }
 

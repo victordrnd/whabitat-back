@@ -18,6 +18,8 @@ class JsonResponse extends Model
   public static function unauthorized(){
     return JsonResponse::array(null, "Not Allowed", "Unauthorized");
   }
+
+  
   public static function exception($e){
     $data = [
       'errors' => $e->getFile(). ' on line : '.$e->getLine(),

@@ -132,31 +132,15 @@ class ProjectController extends Controller
  */
   public function search(SearchProjectRequest $request)
   {
+
     $keyword = $request->keyword ?: null;
+ 
     $status = $request->status ?: null;
     $creator = $request->creator ?: null;
     $created_before = $request->created_before ?:null;
     $created_after = $request->create_after ?: null;
 
-    return Project::when($status, function ($q) use ($status) {
-        $q->where('status_id', $status);
-      })
-    ->when($creator, function ($q) use ($creator) {
-      $q->where('creator_id', $creator);
-    })
-    ->when($created_before, function ($q) use ($created_before) {
-      $q->where('created_at', '<=', $created_before);
-    })
-    ->when($created_after, function ($q) use ($created_after) { 
-      $q->where('created_at', '>=', $created_after);
-    })   
-    ->where(function ($q) use ($keyword) {
-      $q->where('label', 'LIKE', '%' . $keyword . '%')
-        ->orWhereHas('users', function ($profile) use ($keyword) {
-          $profile->where('firstname', 'like', '%' . $keyword . '%')
-            ->orWhere('lastname', 'like', '%' . $keyword . '%');
-        });
-    })
+    return Project::search($keyword,$status,$creator,$created_before, $created_after)
       ->with(['users', 'status'])
       ->get();
   }
