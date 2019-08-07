@@ -11,6 +11,8 @@ use App\Http\Requests\Project\UpdateProjectRequest;
 use App\Http\Requests\Project\DeleteProjectRequest;
 use App\Http\Requests\Project\AssignProjectRequest;
 use App\Http\Requests\Project\SearchProjectRequest;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Psy\Util\Json;
 
 class ProjectController extends Controller
 {
@@ -51,8 +53,8 @@ class ProjectController extends Controller
   {
     $project = Project::create([
       'label' => $request->label,
-      'progress' => $request->progress,
-      'status_id' => $request->status_id,
+      'progress' => $request->progress ?: 0,
+      'status_id' => $request->status_id ?: 1,
       'creator_id' => auth()->user()->id
     ]);
     $formattedproject = Project::where('id', $project->id)->with((['status', 'users']))->first();
@@ -68,13 +70,16 @@ class ProjectController extends Controller
    * @param string $label
    * @return array
    */
-  public function update(UpdateProjectRequest $request)
+  public function update(Request $request, $id)
   {
-    Project::where('id', $request->id)->update([
-      'label' => $request->label,
-      'progress' => $request->progress,
-      'status_id' => $request->status_id
-    ]);
+    try{
+      $project = Project::findOrFail($id);
+    }
+    catch(ModelNotFoundException $e){
+      return JsonResponse::exception($e);
+    }
+    $project->parseProjectUpdateRequest($request);
+    $project->save();
     $project = Project::find($request->id)->with(['status', 'users']);
     return JsonResponse::setData($project);
   }

@@ -11,6 +11,5 @@
 |
 */
 
-Route::get('/', function () {
-    return view('error');
-});
+//Route::view('/{path?}', 'index');
+//Route::view('/', 'error');

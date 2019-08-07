@@ -15,7 +15,12 @@ Use App\Services\UserService;
 class UserController extends Controller
 {
 
+  private $userService;
 
+  public function __construct(UserService $userService)
+    {
+        $this->userService = $userService;
+    }
 
   /**
   * Return all users from users table
@@ -37,7 +42,7 @@ class UserController extends Controller
   */
   public static function get($id){
     try{
-      $user = User::where('id', $id)->with(['projects'])->firstOrFail();
+      $user = User::where('id', $id)->with(['projects', 'projects.status'])->firstOrFail();
 
     }catch(ModelNotFoundException $e){
       return JsonResponse::exception($e);
@@ -46,24 +51,6 @@ class UserController extends Controller
   }
 
 
-
-
-
-  /**
-  * add a user to the user table
-  * @param int $id
-  * @param string $firstname
-  * @param string $lastname
-  * @param string $email
-  * @param date $birth_date
-  * @return array
-  */
-  public static function add(AddUserRequest $request){
-
-    $data = new \App\Services\UserService;
-    $data = $data->create($request);
-    return JsonResponse::setData($data);
-  }
 
 
 
@@ -78,19 +65,16 @@ class UserController extends Controller
   * @param date $birth_date
   * @return array
   */
-  public static function update(UpdateUserRequest $request){
-    // foreach ($request->all() as $proprietyname => $value) {
-    //   if(Schema::hasColumn('users', $proprietyname)){
-    //     User::where('id', $request->id)->update([
-    //       $proprietyname => $value
-    //     ]);
-    //   }
-    // }
-
-    $data = User::findOrFail($request->id);
-    $data->parseUserRequest($request);
+  public function update(Request $request){
+    //return User::find(3);
+    try{
+      $data = User::findOrFail($request->id);
+    }
+    catch(ModelNotFoundException $e){
+      return JsonResponse::exception($e);
+    }
+    $data->parseUserUpdateRequect($request);
     $data->save();
-
     return JsonResponse::setData(User::find($request->id));
   }
 

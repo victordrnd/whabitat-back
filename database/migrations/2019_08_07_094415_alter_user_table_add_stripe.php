@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class ProjectDeletedAt extends Migration
+class AlterUserTableAddStripe extends Migration
 {
     /**
      * Run the migrations.
@@ -13,8 +13,8 @@ class ProjectDeletedAt extends Migration
      */
     public function up()
     {
-        Schema::table('projects',function($table){
-          $table->softDeletes();
+        Schema::table('users', function (Blueprint $table) {
+            $table->string('stripe_id')->after('country')->nullable();
         });
     }
 
@@ -25,8 +25,8 @@ class ProjectDeletedAt extends Migration
      */
     public function down()
     {
-        Schema::table('projects',function($table){
-          $table->dropColumn('deleted_at');
+        Schema::table('users',function(Blueprint $table){
+            $table->dropColumn('stripe_id');
         });
     }
 }

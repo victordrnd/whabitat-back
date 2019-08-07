@@ -36,6 +36,12 @@ class Project extends Model
     return $this->belongsToMany(User::class, "user_projects", "project_id", "user_id");
   }
 
+  public function parseProjectUpdateRequest($request){
+    $this->label = $request->get('label');
+    $this->progress = $request->get('progress');
+    $this->status_id = $request->get('status_id');
+  }
+
   public function scopeSearch($query, $keyword, $status, $creator, $created_before, $created_after)
   {
     $keywords = explode(' ', $keyword);
