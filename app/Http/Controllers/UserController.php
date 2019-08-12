@@ -5,10 +5,6 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\User;
 use App\Response\JsonResponse;
-use App\Http\Requests\Users\AddUserRequest;
-use App\Http\Requests\Users\UpdateUserRequest;
-use App\Http\Requests\Users\DeleteUserRequest;
-use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 Use App\Services\UserService;
 

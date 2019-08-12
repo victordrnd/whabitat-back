@@ -22,6 +22,7 @@ Route::post('auth/login',      'AuthController@login');
 
 
 Route::group(['middleware' => 'jwt.verify'], function () {
+  Route::get('/auth/current',  'AuthController@getCurrentUser');
   Route::group(['prefix' => 'users'], function () {
     Route::get('/', 'UserController@showAll');
     Route::get('/{id}', 'UserController@get');
@@ -31,4 +32,8 @@ Route::group(['middleware' => 'jwt.verify'], function () {
   });
 
 });
+
+//Tests
+
+Route::get('reservations' , 'ReservationController@getFutureReservations');
 

@@ -23,7 +23,7 @@ class AuthController extends Controller
     }
     $credentials = $request->only(['email', 'password']);
     if (!$token = auth()->attempt($credentials)) {
-      return $this->responseJson(Controller::$HTTP_NOK, 'Les identifiants sont incorrects');
+      return $this->responseJson(Controller::$HTTP_UNAUTHORIZED, 'Les identifiants sont incorrects');
     }
     $data =  [
       'user' => auth()->user(),
@@ -54,10 +54,11 @@ class AuthController extends Controller
     $password = $request->password;
     $request->merge(['password' => Hash::make($password)]);
     $user = User::create($request->all());
+    //$user->createAsStripeCustomer();
 
     $credentials = [
-      $request->email => $request->email,
-      $password =>  $password
+      'email' => $request->email,
+      'password' =>  $password
     ];
     if (!$token = auth()->attempt($credentials)) {
       return $this->responseJson(Controller::$HTTP_NOK, 'Les identifiants sont incorrects');
@@ -67,5 +68,10 @@ class AuthController extends Controller
       'token' => $token,
     ];
     return $this->responseJson(Controller::$HTTP_OK, 'Identifiants valides', $data);
+  }
+
+
+  public function getCurrentUser(){
+    return auth()->user();
   }
 }

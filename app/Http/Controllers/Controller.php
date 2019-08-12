@@ -13,6 +13,7 @@ class Controller extends BaseController
 
     public static $HTTP_OK = 200;
     public static $HTTP_NOK = 422;
+    public static $HTTP_UNAUTHORIZED = 401;
     public static $HTTP_VALIDATION_ERROR = 405;
     public static $HTTP_NOT_FOUND = 404;
     public static $HTTP_FORBIDDEN = 403;
@@ -22,27 +23,28 @@ class Controller extends BaseController
     public static $HTTP_TOKEN_INVALID = 502;
     public static $HTTP_TOKEN_EXPIRED = 503;
 
-    public static function responseJson($code, $description, $result = '', $notify = false)
+    public static function responseJson($code, $description, $result = '')
     {
 
         if ($result == '') {
-
-            $return = array('code' => $code, 'description' => $description, 'notify' => $notify);
-            return \Response::json(array('return' => $return));
+            if ($code != 200) {
+                $errors = ['errors' => $description];
+                $return = array('code' => $code, 'description' => $description);
+                return response()->json(array('result' => $errors, 'return' => $return), $code);
+            } else {
+                $return = array('code' => $code, 'description' => $description);
+                return response()->json(array('return' => $return), $code);
+            }
         } else {
-
-            $return = array('code' => $code, 'description' => $description, 'notify' => $notify);
-            return \Response::json(array('result' => $result, 'return' => $return));
+            $return = array('code' => $code, 'description' => $description);
+            return response()->json(array('result' => $result, 'return' => $return), $code);
         }
     }
 
 
-    public function validationError($validator){
-        $data = [
-            'errors' => $validator->errors(),
-            'message' => "Une erreur de validation s'est produite"
-        ];
-
-        return response()->json($data);
+    public function validationError($validator)
+    {
+        $errors = ['errors' => $validator->errors()];
+        return $this->responseJson(422, "Une erreur de validation s'est produite", $errors);
     }
 }
