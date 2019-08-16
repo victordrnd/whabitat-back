@@ -8,16 +8,17 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Validator;
+use Stripe;
 
 class AuthController extends Controller
 {
   public function login(Request $request)
   {
-    $validator  = Validator::make($request->all(),[
+    $validator  = Validator::make($request->all(), [
       'email' => 'required|exists:users,email|email',
       'password' => 'required|string',
     ]);
-    if($validator->fails()){
+    if ($validator->fails()) {
       //return Controller::responseJson(422, 'test',$validator->errors());
       return $this->validationError($validator);
     }
@@ -35,7 +36,7 @@ class AuthController extends Controller
 
   public function signup(Request $request)
   {
-    $validator  = Validator::make($request->all(),[
+    $validator  = Validator::make($request->all(), [
       'firstname' => 'required|string',
       'lastname' => 'required|string',
       'email' => 'required|unique:users,email|email',
@@ -43,7 +44,7 @@ class AuthController extends Controller
       'phone' => 'required|string',
       'country' => 'required|string'
     ]);
-    if($validator->fails()){
+    if ($validator->fails()) {
       //return Controller::responseJson(422, 'test',$validator->errors());
       $errors = [
         'errors' => $validator->errors(),
@@ -54,6 +55,14 @@ class AuthController extends Controller
     $password = $request->password;
     $request->merge(['password' => Hash::make($password)]);
     $user = User::create($request->all());
+    $customer = \Stripe\Customer::create([
+      "email" => $user->email,
+      "name" => $user->lastname . ' ' . $user->firstname,
+      "phone" => $user->phone,
+      "description" => "Compte ".$user->country
+    ]);
+    $user->stripe_id = $customer->id;
+    $user->save();
     //$user->createAsStripeCustomer();
 
     $credentials = [
@@ -71,7 +80,8 @@ class AuthController extends Controller
   }
 
 
-  public function getCurrentUser(){
+  public function getCurrentUser()
+  {
     return auth()->user();
   }
 }

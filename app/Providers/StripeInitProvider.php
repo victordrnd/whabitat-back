@@ -3,8 +3,7 @@
 namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
-use Laravel\Cashier\Cashier;
-
+use Stripe;
 class StripeInitProvider extends ServiceProvider
 {
     /**
@@ -14,7 +13,7 @@ class StripeInitProvider extends ServiceProvider
      */
     public function boot()
     {
-        Cashier::useCurrency('eur', '€');
+        Stripe\Stripe::setApiKey(env('STRIPE_SECRET'));
     }
 
     /**

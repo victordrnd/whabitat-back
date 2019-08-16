@@ -31,6 +31,8 @@ Route::group(['middleware' => 'jwt.verify'], function () {
     Route::post('/delete', 'UserController@delete');
   });
 
+  Route::post('/payments/intent',  'PaymentController@createPaymentIntent');
+  Route::post('/payments/confirm', 'PaymentController@confirmReservation');
 });
 
 //Tests

@@ -8,9 +8,9 @@
         "php": ">=7.0.0",
         "fideloper/proxy": "~3.3",
         "guzzlehttp/guzzle": "^6.3",
-        "laravel/cashier": "7.1.1",
         "laravel/framework": "5.5.*",
         "laravel/tinker": "~1.0",
+        "stripe/stripe-php": "^6.43",
         "tymon/jwt-auth": "1.0.0-rc.4"
     },
     "require-dev": {

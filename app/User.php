@@ -5,22 +5,20 @@ namespace App;
 use Tymon\JWTAuth\Contracts\JWTSubject;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Foundation\Auth\User as Authenticatable;
-use Laravel\Cashier\Billable;
 
 class User extends Authenticatable implements JWTSubject
 {
   use Notifiable;
-  use Billable;
   /**
    * The attributes that are mass assignable.
    *
    * @var array
    */
   protected $fillable = [
-    'firstname', 'lastname', 'email', 'password', 'phone', 'country'
+    'firstname', 'lastname', 'email', 'password', 'phone', 'country', 'stripe_id'
   ];
 
-  protected $hidden = ['password', 'created_at', 'updated_at'];
+  protected $hidden = ['password','stripe_id', 'created_at', 'updated_at'];
 
 
 
