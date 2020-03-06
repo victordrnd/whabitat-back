@@ -1,0 +1,29 @@
+{
+    "success": true,
+    "result": {
+      "data": {
+        "token": "{{token}}",
+        "user": {
+          "id": 163,
+          "firstname": "Omer",
+          "lastname": "Cust",
+          "username": "customer",
+          "fullname": "Cust Omer",
+          "birthday": null,
+          "email": "cust@omer.com",
+          "phone": "0612345678",
+          "role": "customer",
+          "photo": "users_2L6ZFzjf8nlT8ykT.png",
+          "photos": null,
+          "activated": 1,
+          "encdata": [],
+          "device_id": null,
+          "last_login": 1567686509,
+          "from_socials": 0
+        }
+      },
+      "message": "Connecté avec succès",
+      "code": "messages.auth.authenticated"
+    },
+    "errors": []
+  }

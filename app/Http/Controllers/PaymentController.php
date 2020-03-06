@@ -16,8 +16,8 @@ class PaymentController extends Controller
         //Check if reservation available
         $response = null;
         $reservationService = new ReservationsService();
-        $reservationService->getFuturesReservations($response, 1,1);
         $reservation = $request->reservation;
+        $reservationService->getDisabledDates($response, 1,3,$reservation['range']['start']);
         $price = $reservationService->calculatePrice($reservation['range']['start'], $reservation['range']['end'], $reservation['nb']);
         try{
             $intent = \Stripe\PaymentIntent::create([
@@ -35,14 +35,11 @@ class PaymentController extends Controller
 
     public function confirmReservation(Request $request){
         $reservation = $request->reservation;
-        $start = Carbon::parse($reservation['range']['start'])->format('Y-m-d');
-        $end = Carbon::parse($reservation['range']['end'])->format('Y-m-d');
-        $res = Reservation::create([
-            'arrival_date' => $start,
-            'departure_date' => $end,
-            'guest_id' => auth()->user()->id,
-            'property_id' => 1
-        ]);
+        $intent = \Stripe\PaymentIntent::retrieve($request->intent['id']);
+        if($intent['status' ] =="succeeded"){
+            $reservationService = new ReservationsService();
+            $res = $reservationService->createReservation($reservation);
+        }
         return $this->responseJson(200, 'La réservation a bien été enregistré', $res);
     }
 }

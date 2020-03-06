@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Hash;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Validator;
 use Stripe;
+use Tymon\JWTAuth\JWTAuth;
 
 class AuthController extends Controller
 {
@@ -80,8 +81,13 @@ class AuthController extends Controller
   }
 
 
+  public function logout(){
+    JWTAuth::parseToken()->invalidate();
+    return $this->responseJson(200, 'Le token a été invalidé correctement');
+  }
+
   public function getCurrentUser()
   {
-    return auth()->user();
+    return $this->responseJson(200, "l'utilisateur a été retournée",auth()->user());
   }
 }
