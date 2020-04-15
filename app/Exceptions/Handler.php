@@ -49,15 +49,10 @@ class Handler extends ExceptionHandler
   */
   public function render($request, Exception $exception)
   {
-    if ($request->wantsJson()) {
-      return response()->json([
-        'errors' => '',
-        'result' =>[
-          'data' => [],
-          'message' => $exception->getMessage()
-        ],
-        'status_code' => $exception->getCode()
-      ], $exception->getCode());
+    if ($this->isHttpException($exception)) {
+      if ($exception->getStatusCode() == 404) {
+        return Controller::responseJson(404, "La route n'existe pas");
+      }
     }
     return parent::render($request, $exception);
   }

@@ -8,7 +8,9 @@ use Carbon\CarbonPeriod;
 use App\Reservation;
 use GuzzleHttp\Promise;
 use GuzzleHttp\Promise\EachPromise;
+use GuzzleHttp\Pool;
 use GuzzleHttp\Client;
+use Psr\Http\Message\ResponseInterface;
 
 class ReservationsService
 {
@@ -48,17 +50,24 @@ class ReservationsService
             $request = new \GuzzleHttp\Psr7\Request($method,  $url, [
                 'Authorization' => 'Basic ' . $this->credentials,
                 'headers'  => ['content-type' => 'application/json', 'Accept' => 'application/json'],
+                'timeout' => 5, // Response timeout
+                'connect_timeout' => 5,
             ]);
-            $promises[] = $this->http->sendAsync($request);
+            $promises[] = $request;
             //$this->handleRequest($response, $url, $method);
         }
-        $eachPromise = new EachPromise($promises, [
+        $eachPromise = new Pool($this->http ,$promises, [
             // how many concurrency we are use
             'concurrency' => 12,
-            'fulfilled' => function ($response) use (&$availabilities) {
+            'fulfilled' => function (ResponseInterface $response) use (&$availabilities) {
                 $response = json_decode($response->getBody()->getContents(), JSON_UNESCAPED_SLASHES);
+                $availabilities[] = $response;
                 foreach ($response['rooms'] as $room) {
                     if ($room['id'] == "301") {
+                        //dd($response);
+                        for($j =0; $j<8;$j++){
+                            $room['dates'][$j]['availability'] = 0;
+                        }
                         foreach ($room['dates'] as $date) {
                             if ($date['availability'] == 0) {
                                 $availabilities[] = $date['date'];
@@ -68,6 +77,7 @@ class ReservationsService
                 }
             },
             'rejected' => function ($reason) {
+                //dd($reason);
                 // handle promise rejected here
             }
         ]);
@@ -76,7 +86,7 @@ class ReservationsService
     }
 
 
-    public function createReservation($reservation)
+    public function createReservation($reservation, $intent = null)
     {
         $start = Carbon::parse($reservation['range']['start'])->format('Y-m-d');
         $end = Carbon::parse($reservation['range']['end'])->format('Y-m-d');
@@ -85,8 +95,11 @@ class ReservationsService
             'departure_date' => $end,
             'vacanciers' => $reservation['nb'],
             'guest_id' => auth()->user()->id,
-            'property_id' => 1
+            'property_id' => 1,
+            'setup_intent' => $intent['id'],
+            'amount' => $this->calculatePrice($reservation['range']['start'], $reservation['range']['end'], $reservation['nb'])
         ]);
+
         $body = [
             'channelId' => 1,
             'propertyId' => 3,
@@ -133,6 +146,5 @@ class ReservationsService
         $end_at = Carbon::parse($end_at);
         $nights = $end_at->diffInDays($start_at) - 1;
         return $nights * 242;
-        //return array($nights,$start_at,$end_at);
     }
 }
