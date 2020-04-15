@@ -51,7 +51,7 @@ class PaymentController extends Controller
         $response = null;
         if ($intent['status'] == "succeeded") {
             $res = $this->reservationService->createReservation($reservation, $intent);
-            $this->paymentService->createPostHook($response, $res);
+            //$this->paymentService->createPostHook($response, $res);
         }
         return $this->responseJson(200, 'La réservation a bien été enregistré', $res);
     }
