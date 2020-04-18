@@ -3,6 +3,7 @@
 namespace App\Exceptions;
 
 use Exception;
+use App\Http\Controllers\Controller;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 
 class Handler extends ExceptionHandler
