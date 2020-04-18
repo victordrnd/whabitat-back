@@ -11,16 +11,6 @@ class DatabaseSeeder extends Seeder
      */
     public function run()
     {
-        /*$this->call([
-          ProfilTableSeeder::class
-        ]);
-
-
-        $this->call([
-          RightTableSeeder::class
-        ]);*/
-        $this->call([
-          ProfilRightsSeeder::class
-        ]);
+        $this->call(TableTarifSeeder::class);
     }
 }

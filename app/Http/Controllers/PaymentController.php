@@ -29,7 +29,7 @@ class PaymentController extends Controller
         $response = null;
         $reservation = $request->reservation;
         //$this->reservationService->getDisabledDates($response, 1, 3, $reservation['range']['start']);
-        $price = $this->reservationService->calculatePrice($reservation['range']['start'], $reservation['range']['end'], $reservation['nb']);
+        $price = $this->reservationService->calculatePrice($reservation['range']['start'], $reservation['range']['end'],$reservation['adults'], $reservation['children']);
         try {
             $intent = \Stripe\SetupIntent::create([
                 'usage' => 'off_session',
@@ -39,7 +39,11 @@ class PaymentController extends Controller
         } catch (Exception $e) {
             return $this->responseJson(500, $e->getMessage());
         }
-        return $this->responseJson(200, "L'intention de paiement a bien été créer", $intent);
+        $arr = [
+            'intent' => $intent,
+            'amount' => $price
+        ];
+        return $this->responseJson(200, "L'intention de paiement a bien été créer", $arr);
     }
 
 
@@ -51,7 +55,7 @@ class PaymentController extends Controller
         $response = null;
         if ($intent['status'] == "succeeded") {
             $res = $this->reservationService->createReservation($reservation, $intent);
-            //$this->paymentService->createPostHook($response, $res);
+            $this->paymentService->createPostHook($response, $res);
         }
         return $this->responseJson(200, 'La réservation a bien été enregistré', $res);
     }
