@@ -11,7 +11,7 @@ class TableTarifSeeder extends Seeder
      */
     public function run()
     {
-        Tarif::where('id', '!=', 'null')->delete();
+        //Tarif::where('id', '!=', 'null')->delete();
         Tarif::create([
             'start' => '2020-04-02',
             'end' => '2020-07-03',
