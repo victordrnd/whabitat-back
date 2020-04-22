@@ -20,7 +20,7 @@ class MailerService
 				$mail->Username = 'reservations@whabitat.fr';             // SMTP username
 				$mail->Password = env('MAIL_PASSWORD');
 				$mail->SMTPSecure = 'tls';
-				$mail->Port = 465;
+				$mail->Port = 	587;
 
 				//Recipients
 				$mail->setFrom('reservations@whabitat.fr', 'Whabitat');
