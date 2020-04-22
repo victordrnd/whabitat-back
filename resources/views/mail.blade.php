@@ -257,7 +257,7 @@
                                                             <td align="left" style="font-size:0px;padding:15px 15px 15px 15px;word-break:break-word;">
 
                                                                 <div style="font-family:Ubuntu, Helvetica, Arial, sans-serif;font-size:11px;line-height:1.5;text-align:left;color:#000000;">
-                                                                    <p>Félicitation ! Votre réservation du {{\Carbon\Carbon::parse($reservation->arrival_date)->toDayDateTimeString()}} au {{\Carbon\Carbon::parse($reservation->arrival_date)->toDayDateTimeString()}} a bien été enregistrée.</p>
+                                                                <p>Félicitation {{$reservation->guest->firstname}} {{$reservation->guest->lastname}}! Votre réservation du {{\Carbon\Carbon::parse($reservation->arrival_date)->toDayDateTimeString()}} au {{\Carbon\Carbon::parse($reservation->arrival_date)->toDayDateTimeString()}} a bien été enregistrée.</p>
                                                                     <p>&nbsp;</p>
                                                                     <p>L'empreinte bancaire est enregistrée auprès de notre prestataire Stripe. Le paiement ne sera enregistré que 7 jours avant votre arrivée, pour toutes réservations à 7 jours et moins, le prélèvement sera immédiat.&nbsp;</p>
                                                                     <p>&nbsp;</p>

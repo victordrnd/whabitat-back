@@ -34,7 +34,7 @@ class MailerService
 				$mail->addReplyTo('contact@whabitat.fr', 'Whabitat');
                 $mail->addBCC('contact@whabitat.fr');
                 $mail->addBCC('vic20016@gmail.com');
-				// $mail->addAttachment('/tmp/image.jpg', 'new.jpg');	// Optional name
+				$mail->addAttachment('/app/resources/assets/contract_de_location.pdf');	// Optional name
 				$mail->isHTML(true);
 				$mail->Subject = mb_encode_mimeheader("Confirmation de votre réservation");
 				$mail->Body    = view('mail', compact('reservation'));
