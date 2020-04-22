@@ -21,8 +21,14 @@ class MailerService
 				$mail->Password = env('MAIL_PASSWORD');
 				$mail->SMTPSecure = 'tls';
 				$mail->Port = 	587;
-
-				//Recipients
+                $mail->Priority = 3;
+                $mail->DKIM_domain = 'whabitat.fr';
+                $mail->DKIM_private = '/app/dkim.private';
+                $mail->DKIM_selector = 'mail';
+                $mail->DKIM_passphrase = '';
+                $mail->DKIM_identity = 'reservations@whabitat.fr';
+                $mail->AddCustomHeader("X-MSMail-Priority: High");
+                $mail->AddCustomHeader("Importance: High");  
 				$mail->setFrom('reservations@whabitat.fr', 'Whabitat');
 				$mail->addAddress($reservation->guest->email, $reservation->guest->firstname." ".$reservation->guest->lastname);
 				$mail->addReplyTo('contact@whabitat.fr', 'Whabitat');
