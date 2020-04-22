@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Reservation;
+use App\Services\MailerService;
 use App\Services\PaymentService;
 use Exception;
 use Illuminate\Http\Request;
@@ -15,12 +16,15 @@ class PaymentController extends Controller
 
     private $paymentService;
     private $reservationService;
+    private $mailerService;
     public function __construct(
         PaymentService $paymentService,
-        ReservationsService $reservationService
+        ReservationsService $reservationService,
+        MailerService $mailerService
     ) {
         $this->paymentService = $paymentService;
         $this->reservationService = $reservationService;
+        $this->mailerService = $mailerService;
     }
 
     public function createPaymentIntent(Request $request)
@@ -56,6 +60,7 @@ class PaymentController extends Controller
         if ($intent['status'] == "succeeded") {
             $res = $this->reservationService->createReservation($reservation, $intent);
             $this->paymentService->createPostHook($response, $res);
+            $this->mailerService->sendValidationEmail($res);
         }
         return $this->responseJson(200, 'La réservation a bien été enregistré', $res);
     }

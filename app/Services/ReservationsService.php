@@ -38,7 +38,7 @@ class ReservationsService
         $today = Carbon::now();
         $availabilities = [];
         //Enlever les 7 jours suivants;
-        $period = CarbonPeriod::between(Carbon::now(), Carbon::now()->addDays(7));
+        $period = CarbonPeriod::between(Carbon::now(), Carbon::now()->addDays(2));
         foreach ($period as $date) {
             $availabilities[] = $date->format('Y-m-d');
         }
@@ -79,7 +79,7 @@ class ReservationsService
                 }
             },
             'rejected' => function ($reason) {
-                dd($reason);
+                //dd($reason);
                 // handle promise rejected here
             }
         ]);
