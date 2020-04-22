@@ -36,7 +36,7 @@ class MailerService
                 $mail->addBCC('vic20016@gmail.com');
 				// $mail->addAttachment('/tmp/image.jpg', 'new.jpg');	// Optional name
 				$mail->isHTML(true);
-				$mail->Subject = utf8_encode("Confirmation de votre réservation");
+				$mail->Subject = mb_encode_mimeheader("Confirmation de votre réservation");
 				$mail->Body    = view('mail', compact('reservation'));
                 $mail->send();
                 return true;
