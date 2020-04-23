@@ -55,7 +55,9 @@ class PaymentService
             'payment_method_types' => ['card'],
             'confirm' => true,
             'customer' => $reservation->guest->stripe_id,
-            'payment_method' => $setup_intent->payment_method
+            'payment_method' => $setup_intent->payment_method,
+            'statement_descriptor' => "Whabitat Disney",
+            'description' => 'Séjour à Carnetin du '.$reservation->arrival_date.' au '.$reservation->departure_date
           ]);
         return $charge;
     }
