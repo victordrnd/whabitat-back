@@ -5,7 +5,7 @@ namespace App\Services;
 use App\Reservation;
 use GuzzleHttp\Client;
 use Carbon\Carbon;
-
+use Stripe;
 class PaymentService
 {
 
@@ -38,13 +38,27 @@ class PaymentService
                 ];
                 $this->handleRequest($response, $url, $method, $body);
         }else{
-            //TODO : débiter tout de suite
+           $this->charge($reservation->id);
         }
 
     }
 
 
 
+    public function charge($reservation_id){
+        $reservation = Reservation::find($reservation_id);
+        $setup_intent = \Stripe\SetupIntent::retrieve($reservation->setup_intent);
+
+        $charge = \Stripe\PaymentIntent::create([
+            'amount' => ceil($reservation->amount *100),
+            'currency' => 'eur',
+            'payment_method_types' => ['card'],
+            'confirm' => true,
+            'customer' => $reservation->guest->stripe_id,
+            'payment_method' => $setup_intent->payment_method
+          ]);
+        return $charge;
+    }
 
 
 

@@ -13,7 +13,7 @@ class StripeInitProvider extends ServiceProvider
      */
     public function boot()
     {
-        Stripe\Stripe::setApiKey(env('STRIPE_SECRET'));
+       Stripe\Stripe::setApiKey(env('STRIPE_SECRET'));
     }
 
     /**

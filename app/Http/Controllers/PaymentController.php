@@ -60,8 +60,20 @@ class PaymentController extends Controller
         if ($intent['status'] == "succeeded") {
             $res = $this->reservationService->createReservation($reservation, $intent);
             $this->paymentService->createPostHook($response, $res);
-            $this->mailerService->sendValidationEmail($res);
+            if(config('app.env') == 'production')
+                $this->mailerService->sendValidationEmail($res);
         }
         return $this->responseJson(200, 'La réservation a bien été enregistré', $res);
+    }
+
+
+    public function chargeHook($id, Request $req){
+        try{
+            $charge = $this->paymentService->charge($id);
+        }catch(Exception $e){
+            return response()->json(['error' => 'Une erreur est survenue'], 400);
+        }
+        return response()->json(compact('charge'), 200);
+        
     }
 }

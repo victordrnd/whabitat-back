@@ -45,6 +45,8 @@ Route::group(['middleware' => 'jwt.verify'], function () {
   });
 });
 
-//Tests
+Route::group(['prefix' => 'webhooks'], function(){
+  Route::post('/payments/{id}', 'PaymentController@chargeHook')->where('id', '[0-9]+');
+});
 
 Route::post('reservations/dates',     'ReservationController@getDisabledDates');
